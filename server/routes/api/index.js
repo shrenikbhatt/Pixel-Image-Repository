@@ -41,5 +41,24 @@ const getUsers = (request, response) => {
       response.status(200).json(res.rows);
     })
   }
+
+  const deleteImage = (request, response) => {
+    const username = request.user.username;
+    const image_id = parseInt(request.params.image_id);
+    console.log(image_id, username)
+    pool.query('DELETE FROM images WHERE image_id = $1 AND username = $2', [image_id, username], (err, res) => {
+      if (err) throw err;
+      response.status(200).send(`Image deleted with id: ${image_id}`);
+    })
+  }
+
+  const getImage = (request, response) => {
+    const username = request.user.username;
+    const image_id = parseInt(request.params.image_id);
+    pool.query('SELECT * FROM images WHERE image_id = $1 AND username = $2', [image_id, username], (err, res) => {
+      if (err) throw err;
+      response.status(200).json(res.rows[0]);
+    })
+  }
   
-  module.exports = {getUsers, createUser, createImage, getImages}
+  module.exports = {getUsers, createUser, createImage, getImages, deleteImage, getImage}

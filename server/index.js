@@ -24,6 +24,8 @@ app.post('/login', auth.loginUser);
 // Image routes
 app.post('/images', authjwt, upload.single('demo-file'), api.createImage);
 app.get('/images', authjwt, api.getImages)
+app.delete('/images/:image_id', authjwt, api.deleteImage);
+app.get('/images/:image_id', authjwt, api.getImage);
 
 app.listen(port, () => {
     console.log(`Listening at http://localhost:${port}`);
