@@ -9,16 +9,6 @@ const getUsers = (request, response) => {
     })
   }
   
-  const createUser = (request, response) => {
-    const { username, password } = request.body
-  
-    pool.query('INSERT INTO users (username, password) VALUES ($1, $2)', [username, password], (error, result) => {
-      if (error) {
-        throw error
-      }
-      response.status(201).send(`User added with ID: ${result.user_id}`)
-    })
-  }
   
   const createImage = (request, response) => {
     const username = request.user.username;
@@ -71,4 +61,4 @@ const getUsers = (request, response) => {
     })
   }
   
-  module.exports = {getUsers, createUser, createImage, getImages, deleteImage, getImage, getTaggedImages}
+  module.exports = {getUsers, createImage, getImages, deleteImage, getImage, getTaggedImages}

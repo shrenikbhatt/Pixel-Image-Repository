@@ -20,4 +20,23 @@ const loginUser = (req, res) => {
     })
 }
 
-module.exports = { loginUser }
+const createUser = (req, res) => {
+    const { username, password } = req.body
+    pool.query('SELECT * FROM users WHERE username = $1', [username], (error, result) => {
+      if (error) throw error;
+      if (result.rows.length){
+        return res.status(400).json({"Error": "Username already in use"})
+      }
+      pool.query('INSERT INTO users (username, password) VALUES ($1, $2)', [username, password], (error, result) => {
+        if (error) {
+          throw error
+        }
+        const token = jwt.sign({username: username}, process.env.ACCESS_TOKEN);
+        return res.status(200).json({token});
+      })
+    })
+  
+    
+  }
+
+module.exports = { createUser, loginUser }

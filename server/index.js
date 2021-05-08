@@ -4,6 +4,8 @@ const api = require('./routes/api')
 const auth = require('./routes/auth')
 var multer  = require('multer')
 
+const cors = require('cors')
+
 const authjwt = require('./middleware/auth').authjwt
 
 var storage = multer.memoryStorage()
@@ -15,9 +17,10 @@ const app = express();
 const port = process.env.PORT;
 app.use(express.json()) // for parsing application/json
 app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
+app.use(cors())
 
-app.get('/users', authjwt, api.getUsers);
-app.post('/users',api.createUser);
+// app.get('/users', authjwt, api.getUsers);
+app.post('/users', auth.createUser);
 
 app.post('/login', auth.loginUser);
 
