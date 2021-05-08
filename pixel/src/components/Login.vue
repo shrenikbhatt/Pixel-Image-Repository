@@ -58,7 +58,7 @@
 </template>
 
 <script>
-  import axios from 'axios';
+  // import axios from 'axios';
   export default {
     name: 'Login',
 
@@ -70,31 +70,43 @@
   methods: {
     validate() {
       if (this.$refs.loginForm.validate()) {
-        const body = {
-          username: this.loginUsername,
-          password: this.loginPassword
-        }
-        axios.post('http://localhost:3000/login/', body)
-        .then((result) => {
-          localStorage.token = result.data.token;
-        })
-        .catch((err)=> {
-          console.log(err)}
-        );
+        let username = this.loginUsername;
+        let password = this.loginPassword;
+        this.$store
+            .dispatch("login", { username, password })
+            .then(() => this.$router.push("/"))
+            .catch(err => console.log(err));
+        // const body = {
+        //   username: this.loginUsername,
+        //   password: this.loginPassword
+        // }
+        // axios.post('http://localhost:3000/login/', body)
+        // .then((result) => {
+        //   localStorage.token = result.data.token;
+        // })
+        // .catch((err)=> {
+        //   console.log(err)}
+        // );
       }
       else if (this.$refs.registerForm.validate()) {
-        const body = {
-          username: this.username,
-          password: this.password
-        }
-        // console.log("here")
-        axios.post('http://localhost:3000/users/', body)
-        .then((result) => {
-          localStorage.token = result.data.token;
-        })
-        .catch((err)=> {
-          console.log(err)}
-        );
+        let username = this.username;
+        let password = this.password;
+        this.$store
+            .dispatch("Register", { username, password })
+            .then(() => this.$router.push("/"))
+            .catch(err => console.log(err));
+        // const body = {
+        //   username: this.username,
+        //   password: this.password
+        // }
+        // // console.log("here")
+        // axios.post('http://localhost:3000/users/', body)
+        // .then((result) => {
+        //   localStorage.token = result.data.token;
+        // })
+        // .catch((err)=> {
+        //   console.log(err)}
+        // );
       }
     },
     reset() {
