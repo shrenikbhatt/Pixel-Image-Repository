@@ -60,5 +60,15 @@ const getUsers = (request, response) => {
       response.status(200).json(res.rows[0]);
     })
   }
+
+  const getTaggedImages = (request, response) => {
+    const username = request.user.username;
+    const {tag} = request.body
+    console.log(tag, username)
+    pool.query('SELECT * FROM images WHERE $1 = ANY (tags) AND username = $2', [tag, username], (err, res) => {
+      if (err) throw err;
+      response.status(200).json(res.rows);
+    })
+  }
   
-  module.exports = {getUsers, createUser, createImage, getImages, deleteImage, getImage}
+  module.exports = {getUsers, createUser, createImage, getImages, deleteImage, getImage, getTaggedImages}
