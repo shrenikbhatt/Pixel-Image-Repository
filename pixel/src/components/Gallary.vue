@@ -1,102 +1,91 @@
 <template>
-  <v-container>
-    <v-card class="overflow-hidden">
-      <v-app-bar
-        
-        color="purple accent-4"
-        dark
-        elevate-on-scroll
-        scroll-target="#scrolling-techniques-7"
-      >
-        <v-toolbar-title>Welcome {{username}}</v-toolbar-title>
+  <div>
+    <v-app-bar
+      color="purple accent-4"
+      dark
+    >
+      <v-toolbar-title>Welcome {{username}}</v-toolbar-title>
 
-        <v-spacer></v-spacer>
+      <v-spacer></v-spacer>
 
-        <v-text-field
-          class="pt-5"
-          v-model="search"
-          label="Search tag here"
-          prepend-icon="mdi-magnify"
-          single-line
-          @keydown.enter="getTaggedImages"
-        ></v-text-field>
+      <v-text-field
+        class="pt-5"
+        v-model="search"
+        label="Search tag here"
+        prepend-icon="mdi-magnify"
+        single-line
+        @keydown.enter="getTaggedImages"
+      ></v-text-field>
 
-        <v-tooltip bottom>
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              icon
-              @click.stop="dialog = true"
-              v-bind="attrs"
-              v-on="on"
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn
+            icon
+            @click.stop="dialog = true"
+            v-bind="attrs"
+            v-on="on"
+          >
+            <v-icon>mdi-plus</v-icon>
+          </v-btn>
+          </template>
+        <span>Add Image</span>
+      </v-tooltip>
+
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn
+            icon
+            @click="logout"
+            v-bind="attrs"
+            v-on="on"
+          >
+            <v-icon>mdi-logout</v-icon>
+          </v-btn>
+          </template>
+        <span>Logout</span>
+      </v-tooltip>
+    </v-app-bar>
+    <v-container>
+      <v-row>
+        <v-col
+          v-for="n in images.length"
+          :key="n-1"
+          class="d-flex child-flex"
+          cols="4"
+          @click="selectImage(n-1)"
+        >
+          <v-hover
+            v-slot="{ hover }"
+          >
+            <v-card
+              class="justify-center align-center"
+              :elevation="hover ? 10 : 2"
             >
-              <v-icon>mdi-plus</v-icon>
-            </v-btn>
-            </template>
-          <span>Add Image</span>
-        </v-tooltip>
-
-        <v-tooltip bottom>
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              icon
-              @click="logout"
-              v-bind="attrs"
-              v-on="on"
-            >
-              <v-icon>mdi-logout</v-icon>
-            </v-btn>
-            </template>
-          <span>Logout</span>
-        </v-tooltip>
-      </v-app-bar>
-      <v-sheet
-        id="scrolling-techniques-7"
-        class="overflow-y-auto pt-12"
-        max-height="600"
-      >
-        <v-container>
-          <v-row>
-            <v-col
-              v-for="n in images.length"
-              :key="n-1"
-              class="d-flex child-flex"
-              cols="4"
-              @click="selectImage(n-1)"
-            >
-              <v-hover
-                v-slot="{ hover }"
+              <v-img
+                :src="images[n-1].path"
+                contain
+                height="200"
+                width="400"
+                class="grey lighten-2"
               >
-                <v-card
-                  class="justify-center align-center"
-                  :elevation="hover ? 10 : 2"
-                >
-                  <v-img
-                    :src="images[n-1].path"
-                    contain
-                    height="200"
-                    width="400"
-                    class="grey lighten-2"
+                <template v-slot:placeholder>
+                  <v-row
+                    class="fill-height ma-0"
+                    align="center"
+                    justify="center"
                   >
-                    <template v-slot:placeholder>
-                      <v-row
-                        class="fill-height ma-0"
-                        align="center"
-                        justify="center"
-                      >
-                        <v-progress-circular
-                          indeterminate
-                          color="grey lighten-5"
-                        ></v-progress-circular>
-                      </v-row>
-                    </template>
-                  </v-img>
-                </v-card>
-              </v-hover>
-            </v-col>
-          </v-row>
-        </v-container>
-      </v-sheet>
-    </v-card>
+                    <v-progress-circular
+                      indeterminate
+                      color="grey lighten-5"
+                    ></v-progress-circular>
+                  </v-row>
+                </template>
+              </v-img>
+            </v-card>
+          </v-hover>
+        </v-col>
+      </v-row>
+    </v-container>
     <v-dialog
       v-model="dialog"
       persistent
@@ -149,7 +138,55 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-  </v-container>
+    <v-dialog
+      v-model="dialog2"
+      v-if="image"
+      max-width="800"
+    >
+      <v-card
+        class="mx-auto"
+        max-width="800"
+      >
+        <v-img
+          contain
+          :src="image.path"
+        ></v-img>
+
+        <v-card-title class="justify-center">
+          {{image.name}}
+        </v-card-title>
+
+        <v-card-subtitle class="text-center">
+          <v-chip
+            color="purple"
+            class="ma-2"
+            outlined
+            v-for="k in image.tags.length" :key="k"
+          >
+            {{image.tags[k-1]}}
+          </v-chip>
+        </v-card-subtitle>
+
+        <v-card-actions>
+          <v-btn
+            dark
+            color="purple accent-4"
+            @click.stop="dialog2=false"
+          >
+            Close
+          </v-btn>
+          <v-spacer></v-spacer>
+          <v-btn
+            dark
+            color="red accent-4"
+            @click="deleteImage()"
+          >
+            Delete
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+  </div>
 </template>
 
 <script>
@@ -226,17 +263,32 @@
       selectImage(key){
         this.$http.get('http://localhost:3000/images/'+this.images[key].image_id)
           .then(response => {
-            console.log(response);
+            this.image = response.data
+            this.dialog2 = true
           })
           .catch(err => console.log(err))
+      },
+      deleteImage(){
+        this.$http.delete('http://localhost:3000/images/'+this.image.image_id)
+        .then(() => {
+          this.images = this.images.filter((item) => {
+            return item.image_id != this.image.image_id;
+          })
+        })
+        .catch(err => {
+          console.log(err)
+        });
+        this.dialog2=false
       }
     },
 
     data: () => ({
       search: '',
       images: [],
+      image: null,
       length: 0,
       dialog: false,
+      dialog2: false,
       tags: '',
       fileName: '',
       file: null,

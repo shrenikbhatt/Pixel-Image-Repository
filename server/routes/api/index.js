@@ -1,4 +1,7 @@
 const pool = require('../../dbConfig').pool;
+var path = require('path');
+var dir = path.join(__dirname, '..','..', 'uploads');
+const fs = require('fs')
 
 const getUsers = (request, response) => {
     pool.query('SELECT * FROM users ORDER BY user_id ASC', (error, results) => {
@@ -36,8 +39,14 @@ const getUsers = (request, response) => {
   const deleteImage = (request, response) => {
     const username = request.user.username;
     const image_id = parseInt(request.params.image_id);
-    pool.query('DELETE FROM images WHERE image_id = $1 AND username = $2', [image_id, username], (err, res) => {
+    pool.query('DELETE FROM images WHERE image_id = $1 AND username = $2 RETURNING *', [image_id, username], (err, res) => {
       if (err) throw err;
+      fs.unlink(dir + '/' + res.rows[0].path.split('/').pop(), (err) => {
+        if (err) {
+          console.error(err)
+          return
+        }
+      });
       response.status(200).send(`Image deleted with id: ${image_id}`);
     })
   }
