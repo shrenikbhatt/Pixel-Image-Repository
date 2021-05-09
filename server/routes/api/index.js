@@ -12,9 +12,9 @@ const getUsers = (request, response) => {
   
   const createImage = (request, response) => {
     const username = request.user.username;
-    const {tags, name} = request.body;
+    const {tags, fileName} = request.body;
     const path = 'http://localhost:3000/' + request.file.filename; 
-    pool.query('INSERT INTO images (username, name, tags, path) VALUES ($1, $2, $3, $4)', [username, name, JSON.parse(tags), path], (error, result) => {
+    pool.query('INSERT INTO images (username, name, tags, path) VALUES ($1, $2, $3, $4)', [username, fileName, JSON.parse(tags), path], (error, result) => {
         if (error) {
           throw error
         }
@@ -39,7 +39,6 @@ const getUsers = (request, response) => {
   const deleteImage = (request, response) => {
     const username = request.user.username;
     const image_id = parseInt(request.params.image_id);
-    console.log(image_id, username)
     pool.query('DELETE FROM images WHERE image_id = $1 AND username = $2', [image_id, username], (err, res) => {
       if (err) throw err;
       response.status(200).send(`Image deleted with id: ${image_id}`);
@@ -58,7 +57,6 @@ const getUsers = (request, response) => {
   const getTaggedImages = (request, response) => {
     const username = request.user.username;
     const {tag} = request.body
-    console.log(tag, username)
     pool.query('SELECT * FROM images WHERE $1 = ANY (tags) AND username = $2', [tag, username], (err, res) => {
       if (err) throw err;
       response.status(200).json(res.rows);

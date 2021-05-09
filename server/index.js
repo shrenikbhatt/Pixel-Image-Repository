@@ -14,7 +14,7 @@ var storage = multer.diskStorage({
         cb(null, './uploads');
      },
     filename: function (req, file, cb) {
-        cb(null , req.body.name + '.' + file.originalname.split('.').pop());
+        cb(null , req.body.fileName + '.' + file.originalname.split('.').pop());
         
     }
 });
@@ -36,7 +36,7 @@ app.post('/users', auth.createUser);
 app.post('/login', auth.loginUser);
 
 // Image routes
-app.post('/images', authjwt, upload.single('demo-file'), api.createImage);
+app.post('/images', authjwt, upload.single('file'), api.createImage);
 app.get('/images', authjwt, api.getImages)
 app.delete('/images/:image_id', authjwt, api.deleteImage);
 app.get('/images/:image_id', authjwt, api.getImage);

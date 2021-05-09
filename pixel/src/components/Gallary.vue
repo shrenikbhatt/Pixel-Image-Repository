@@ -13,9 +13,11 @@
         <v-spacer></v-spacer>
 
         <v-text-field
+          v-model="search"
           label="Search tag here"
           prepend-icon="mdi-magnify"
           single-line
+          @keydown.enter="getTaggedImages"
         ></v-text-field>
 
         <v-tooltip bottom>
@@ -29,7 +31,7 @@
               <v-icon>mdi-plus</v-icon>
             </v-btn>
             </template>
-          <span>Insert new Image</span>
+          <span>Add Image</span>
         </v-tooltip>
 
         <v-tooltip bottom>
@@ -48,10 +50,10 @@
       </v-app-bar>
       <v-sheet
         id="scrolling-techniques-7"
-        class="overflow-y-auto"
+        class="overflow-y-auto pt-14"
         max-height="600"
       >
-        <v-container style="height: 1500px;">
+        <v-container>
           <v-row>
             <v-col
               v-for="n in images.length"
@@ -59,15 +61,10 @@
               class="d-flex child-flex"
               cols="4"
             >
-              <!-- <v-img
-                :src="`https://picsum.photos/500/300?image=${n * 5 + 10}`"
-                :lazy-src="`https://picsum.photos/10/6?image=${n * 5 + 10}`"
-                aspect-ratio="1"
-                class="grey lighten-2"
-              > -->
               <v-img
                 :src="images[n-1]"
-                aspect-ratio="1"
+                max-height="500"
+                max-width="500"
                 class="grey lighten-2"
               >
                 <template v-slot:placeholder>
@@ -90,33 +87,52 @@
     </v-card>
     <v-dialog
       v-model="dialog"
-      max-width="290"
+      persistent
+      max-width="340"
     >
       <v-card>
         <v-card-title class="headline">
-          Use Google's location service?
+          Upload New Image
         </v-card-title>
 
         <v-card-text>
-          Let Google help apps determine location. This means sending anonymous location data to Google, even when no apps are running.
+            <v-form ref="insertForm" v-model="valid" lazy-validation>
+                <v-row>
+                    <v-col cols="12">
+                        <v-text-field v-model="fileName" :rules="[rules.required]" label="File Name" required></v-text-field>
+                    </v-col>
+                    <v-col cols="12">
+                        <v-text-field v-model="tags" label="tags (seperated by comma)" :rules="[rules.required]" required></v-text-field>
+                    </v-col>
+                    <v-col cols="12">
+                      <v-file-input
+                        v-model="file"
+                        accept="image/*"
+                        label="File input"
+                        :rules="[rules.required]"
+                      ></v-file-input>
+                    </v-col>
+                </v-row>
+            </v-form>
         </v-card-text>
 
         <v-card-actions>
           <v-spacer></v-spacer>
 
           <v-btn
-            color="green darken-1"
+            color="red darken-1"
             text
-            @click="dialog = false"
+            @click="reset"
           >
-            Disagree
+            Cancel
           </v-btn>
           <v-btn
             color="green darken-1"
             text
-            @click="dialog = false"
+            :disabled="!valid"
+            @click="insertImage"
           >
-            Agree
+            Upload
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -142,6 +158,7 @@
       getImages() {
         this.$http.get('http://localhost:3000/images')
         .then(response => {
+          this.images = []
           response.data.forEach(item => {
             this.images.push(item.path);
           });
@@ -152,13 +169,61 @@
           .dispatch("logout")
           .then(() => this.$router.push("/login"))
           .catch(err => console.log(err));
+      },
+      insertImage(){
+        if(this.$refs.insertForm.validate()){
+          let tags = this.tags.split(',').map(item => item.trim());
+          let fileName = this.fileName;
+          let file = this.file
+          let formData = new FormData();
+          formData.append('fileName', fileName);
+          formData.append('tags', JSON.stringify(tags));
+          formData.append('file', file);
+          this.$store
+            .dispatch('insertImage', formData)
+            .then(() => {
+              this.getImages()
+            })
+            .catch(err => console.log(err));
+          this.reset();
+        }
+      },
+      reset() {
+        this.dialog = false;
+        this.$refs.insertForm.reset();
+        this.$refs.insertForm.resetValidation();
+      },
+      getTaggedImages(){
+        if(this.search == ''){
+          this.getImages();
+        }
+        else{
+          let body = {
+            tag: this.search
+          }
+          this.$http.post('http://localhost:3000/images/tag', body)
+            .then(response => {
+              this.images = []
+              response.data.forEach(item => {
+                this.images.push(item.path);
+            });
+          })
+        }
       }
     },
 
     data: () => ({
+      search: '',
       images: [],
       length: 0,
       dialog: false,
+      tags: '',
+      fileName: '',
+      file: null,
+      valid: true,
+      rules: {
+        required: value => !!value || "Required.",
+      }
     }),
   }
 </script>
