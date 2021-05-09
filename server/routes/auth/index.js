@@ -15,7 +15,7 @@ const loginUser = (req, res) => {
         }
         const user = result.rows[0];
         const token = jwt.sign({username: user.username}, process.env.ACCESS_TOKEN);
-        return res.status(200).json({token});
+        return res.status(200).json({token, username: user.username});
 
     })
 }
@@ -32,7 +32,7 @@ const createUser = (req, res) => {
           throw error
         }
         const token = jwt.sign({username: username}, process.env.ACCESS_TOKEN);
-        return res.status(200).json({token});
+        return res.status(200).json({token, username});
       })
     })
   

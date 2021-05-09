@@ -1,4 +1,5 @@
 require('dotenv').config();
+var path = require('path');
 const express = require('express');
 const api = require('./routes/api')
 const auth = require('./routes/auth')
@@ -8,13 +9,23 @@ const cors = require('cors')
 
 const authjwt = require('./middleware/auth').authjwt
 
-var storage = multer.memoryStorage()
+var storage = multer.diskStorage({
+    destination: function(req, file, cb) {
+        cb(null, './uploads');
+     },
+    filename: function (req, file, cb) {
+        cb(null , req.body.name + '.' + file.originalname.split('.').pop());
+        
+    }
+});
 var upload = multer({ storage: storage })
 
 
 // Express and port setup
 const app = express();
 const port = process.env.PORT;
+var dir = path.join(__dirname, 'uploads');
+app.use(express.static(dir));
 app.use(express.json()) // for parsing application/json
 app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
 app.use(cors())

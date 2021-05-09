@@ -13,8 +13,8 @@ const getUsers = (request, response) => {
   const createImage = (request, response) => {
     const username = request.user.username;
     const {tags, name} = request.body;
-    const data = request.file.buffer;
-    pool.query('INSERT INTO images (username, name, tags, data) VALUES ($1, $2, $3, $4)', [username, name, JSON.parse(tags), data], (error, result) => {
+    const path = 'http://localhost:3000/' + request.file.filename; 
+    pool.query('INSERT INTO images (username, name, tags, path) VALUES ($1, $2, $3, $4)', [username, name, JSON.parse(tags), path], (error, result) => {
         if (error) {
           throw error
         }
@@ -28,6 +28,10 @@ const getUsers = (request, response) => {
       if (err){
         throw err;
       }
+      res.rows.forEach(item => {
+        item.data = 'data:image/jpeg;base64,'+Buffer.from(new Uint8Array(item.data).reduce((data,byte) => data+ String.fromCharCode(byte), '')).toString('base64')
+      })
+
       response.status(200).json(res.rows);
     })
   }
