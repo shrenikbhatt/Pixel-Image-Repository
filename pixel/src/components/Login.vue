@@ -3,13 +3,16 @@
     <div>
       <v-tabs v-model="tab" show-arrows background-color="purple accent-4" icons-and-text dark grow>
           <v-tabs-slider color="purple darken-4"></v-tabs-slider>
-          <v-tab v-for="i in tabs" :key="tabs[i]">
+          <v-tab v-for="i in tabs" :key="tabs[i]" @click="reset">
               <v-icon large>{{ i.icon }}</v-icon>
               <div class="caption py-1">{{ i.name }}</div>
           </v-tab>
           <v-tab-item>
               <v-card class="px-4">
                   <v-card-text>
+                      <v-alert v-model="showError" type="error">
+                        {{error}}
+                      </v-alert>
                       <v-form ref="loginForm" v-model="valid" lazy-validation>
                           <v-row>
                               <v-col cols="12">
@@ -32,6 +35,9 @@
           <v-tab-item>
               <v-card class="px-4">
                   <v-card-text>
+                    <v-alert v-model="showError" type="error">
+                      {{error}}
+                    </v-alert>
                       <v-form ref="registerForm" v-model="valid" lazy-validation>
                           <v-row>
                               <v-col>
@@ -75,18 +81,10 @@
         this.$store
             .dispatch("login", { username, password })
             .then(() => this.$router.push("/"))
-            .catch(err => console.log(err));
-        // const body = {
-        //   username: this.loginUsername,
-        //   password: this.loginPassword
-        // }
-        // axios.post('http://localhost:3000/login/', body)
-        // .then((result) => {
-        //   localStorage.token = result.data.token;
-        // })
-        // .catch((err)=> {
-        //   console.log(err)}
-        // );
+            .catch(err => {
+              this.showError = true
+              this.error = err.response.data.error
+            });
       }
       else if (this.$refs.registerForm.validate()) {
         let username = this.username;
@@ -94,30 +92,22 @@
         this.$store
             .dispatch("register", { username, password })
             .then(() => this.$router.push("/"))
-            .catch(err => console.log(err));
-        // const body = {
-        //   username: this.username,
-        //   password: this.password
-        // }
-        // // console.log("here")
-        // axios.post('http://localhost:3000/users/', body)
-        // .then((result) => {
-        //   localStorage.token = result.data.token;
-        // })
-        // .catch((err)=> {
-        //   console.log(err)}
-        // );
+            .catch(err => {
+              this.showError = true
+              this.error = err.response.data.error
+            });
       }
     },
     reset() {
-      this.$refs.form.reset();
+      this.showError = false
+      this.$refs.registerForm.reset();
+      this.$refs.loginForm.reset();
     },
-    resetValidation() {
-      this.$refs.form.resetValidation();
-    }
   },
   data: () => ({
     dialog: true,
+    showError: false,
+    error: '',
     tab: 0,
     tabs: [
         {name:"Login", icon:"mdi-account"},

@@ -20,7 +20,19 @@ var storage = multer.diskStorage({
         
     }
 });
-var upload = multer({ storage: storage })
+var upload = multer({ 
+    storage: storage,
+    fileFilter: function (req, file, callback) {
+        var ext = path.extname(file.originalname);
+        if(ext !== '.png' && ext !== '.jpg' && ext !== '.gif' && ext !== '.jpeg') {
+            return callback(new Error('Only images are allowed'))
+        }
+        callback(null, true)
+    },
+    limits:{
+        fileSize: 5000000
+    }
+ })
 
 
 // Express and port setup
