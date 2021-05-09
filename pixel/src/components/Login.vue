@@ -61,7 +61,7 @@
   // import axios from 'axios';
   export default {
     name: 'Login',
-
+    
     computed: {
     passwordMatch() {
       return () => this.password === this.verify || "Password must match";

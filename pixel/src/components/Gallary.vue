@@ -2,7 +2,7 @@
   <v-container>
     <v-card class="overflow-hidden">
       <v-app-bar
-        absolute
+        
         color="purple accent-4"
         dark
         elevate-on-scroll
@@ -13,6 +13,7 @@
         <v-spacer></v-spacer>
 
         <v-text-field
+          class="pt-5"
           v-model="search"
           label="Search tag here"
           prepend-icon="mdi-magnify"
@@ -50,7 +51,7 @@
       </v-app-bar>
       <v-sheet
         id="scrolling-techniques-7"
-        class="overflow-y-auto pt-14"
+        class="overflow-y-auto pt-12"
         max-height="600"
       >
         <v-container>
@@ -60,26 +61,37 @@
               :key="n-1"
               class="d-flex child-flex"
               cols="4"
+              @click="selectImage(n-1)"
             >
-              <v-img
-                :src="images[n-1]"
-                max-height="500"
-                max-width="500"
-                class="grey lighten-2"
+              <v-hover
+                v-slot="{ hover }"
               >
-                <template v-slot:placeholder>
-                  <v-row
-                    class="fill-height ma-0"
-                    align="center"
-                    justify="center"
+                <v-card
+                  class="justify-center align-center"
+                  :elevation="hover ? 10 : 2"
+                >
+                  <v-img
+                    :src="images[n-1].path"
+                    contain
+                    height="200"
+                    width="400"
+                    class="grey lighten-2"
                   >
-                    <v-progress-circular
-                      indeterminate
-                      color="grey lighten-5"
-                    ></v-progress-circular>
-                  </v-row>
-                </template>
-              </v-img>
+                    <template v-slot:placeholder>
+                      <v-row
+                        class="fill-height ma-0"
+                        align="center"
+                        justify="center"
+                      >
+                        <v-progress-circular
+                          indeterminate
+                          color="grey lighten-5"
+                        ></v-progress-circular>
+                      </v-row>
+                    </template>
+                  </v-img>
+                </v-card>
+              </v-hover>
             </v-col>
           </v-row>
         </v-container>
@@ -160,7 +172,7 @@
         .then(response => {
           this.images = []
           response.data.forEach(item => {
-            this.images.push(item.path);
+            this.images.push(item);
           });
         })
       },
@@ -205,10 +217,18 @@
             .then(response => {
               this.images = []
               response.data.forEach(item => {
-                this.images.push(item.path);
+                this.images.push(item);
             });
+            
           })
         }
+      },
+      selectImage(key){
+        this.$http.get('http://localhost:3000/images/'+this.images[key].image_id)
+          .then(response => {
+            console.log(response);
+          })
+          .catch(err => console.log(err))
       }
     },
 

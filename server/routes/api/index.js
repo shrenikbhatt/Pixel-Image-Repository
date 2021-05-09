@@ -28,9 +28,6 @@ const getUsers = (request, response) => {
       if (err){
         throw err;
       }
-      res.rows.forEach(item => {
-        item.data = 'data:image/jpeg;base64,'+Buffer.from(new Uint8Array(item.data).reduce((data,byte) => data+ String.fromCharCode(byte), '')).toString('base64')
-      })
 
       response.status(200).json(res.rows);
     })
