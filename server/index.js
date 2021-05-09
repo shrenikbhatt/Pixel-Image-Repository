@@ -37,9 +37,11 @@ var upload = multer({
 
 // Express and port setup
 const app = express();
-const port = process.env.PORT;
+const port = process.env.PORT || 3000;
 var dir = path.join(__dirname, 'uploads');
+var dir2 = path.join(__dirname, 'public')
 app.use(express.static(dir));
+app.use(express.static(dir2));
 app.use(express.json()) // for parsing application/json
 app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
 app.use(cors())
@@ -57,5 +59,5 @@ app.get('/images/:image_id', authjwt, api.getImage);
 app.post('/images/tag', authjwt, api.getTaggedImages);
 
 app.listen(port, () => {
-    console.log(`Listening at http://localhost:${port}`);
+    console.log(`Listening on port: ${port}`);
 });

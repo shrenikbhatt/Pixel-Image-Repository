@@ -16,7 +16,7 @@ const getUsers = (request, response) => {
   const createImage = (request, response) => {
     const username = request.user.username;
     const {tags, fileName} = request.body;
-    const path = 'http://localhost:3000/' + request.file.filename; 
+    const path = '/' + request.file.filename; 
     pool.query('INSERT INTO images (username, name, tags, path) VALUES ($1, $2, $3, $4)', [username, fileName, JSON.parse(tags), path], (error, result) => {
         if (error) {
           throw error

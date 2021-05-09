@@ -205,7 +205,7 @@
 
     methods: {
       getImages() {
-        this.$http.get('http://localhost:3000/images')
+        this.$http.get('/images')
         .then(response => {
           this.images = []
           response.data.forEach(item => {
@@ -250,7 +250,7 @@
           let body = {
             tag: this.search
           }
-          this.$http.post('http://localhost:3000/images/tag', body)
+          this.$http.post('/images/tag', body)
             .then(response => {
               this.images = []
               response.data.forEach(item => {
@@ -261,7 +261,7 @@
         }
       },
       selectImage(key){
-        this.$http.get('http://localhost:3000/images/'+this.images[key].image_id)
+        this.$http.get('/images/'+this.images[key].image_id)
           .then(response => {
             this.image = response.data
             this.dialog2 = true
@@ -269,7 +269,7 @@
           .catch(err => console.log(err))
       },
       deleteImage(){
-        this.$http.delete('http://localhost:3000/images/'+this.image.image_id)
+        this.$http.delete('/images/'+this.image.image_id)
         .then(() => {
           this.images = this.images.filter((item) => {
             return item.image_id != this.image.image_id;

@@ -38,7 +38,7 @@ export default new Vuex.Store({
     login({ commit }, user) {
     return new Promise((resolve, reject) => {
       commit('auth_request')
-      axios({ url: 'http://localhost:3000/login', data: user, method: 'POST' })
+      axios({ url: '/login', data: user, method: 'POST' })
         .then(resp => {
           const data = {
             token: resp.data.token,
@@ -61,7 +61,7 @@ export default new Vuex.Store({
     register({ commit }, user) {
       return new Promise((resolve, reject) => {
         commit('auth_request')
-        axios({ url: 'http://localhost:3000/users', data: user, method: 'POST' })
+        axios({ url: '/users', data: user, method: 'POST' })
           .then(resp => {
             const data = {
               token: resp.data.token,
@@ -93,7 +93,7 @@ export default new Vuex.Store({
     insertImage({commit}, formData){
       return new Promise((resolve, reject) => {
         commit('start_upload')
-        axios({ url: 'http://localhost:3000/images', data: formData, method: 'POST'})
+        axios({ url: '/images', data: formData, method: 'POST'})
         .then(resp => {
           commit('finish_upload')
           resolve(resp);
