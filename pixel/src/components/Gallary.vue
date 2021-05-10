@@ -11,7 +11,7 @@
       <v-text-field
         class="pt-5"
         v-model="search"
-        label="Search tag here"
+        label="Search tag here and press enter"
         prepend-icon="mdi-magnify"
         single-line
         @keydown.enter="getTaggedImages"
